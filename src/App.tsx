@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { useRoutes } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContextProvider";
+import {
+  PROTECTED_ROUTES_ADMIN,
+  PROTECTED_ROUTES_SYSTEM_MANAGER,
+  UNPROTECTED_ROUTES,
+} from "./routes";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const auth = useAuth();
+
+  let routes;
+
+  if (auth.isLoggedIn) {
+    switch (auth.role) {
+      case "admin":
+        routes = PROTECTED_ROUTES_ADMIN;
+        break;
+      case "system_manager":
+        routes = PROTECTED_ROUTES_SYSTEM_MANAGER;
+        break;
+      default:
+        routes = UNPROTECTED_ROUTES;
+        break;
+    }
+  } else {
+    routes = UNPROTECTED_ROUTES;
+  }
+
+  const renderRoutes = useRoutes(routes);
+  return <>{renderRoutes}</>;
 }
 
 export default App;
